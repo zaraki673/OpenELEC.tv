@@ -1,6 +1,6 @@
 ################################################################################
 #      This file is part of OpenELEC - http://www.openelec.tv
-#      Copyright (C) 2009-2014 Stephan Raue (stephan@openelec.tv)
+#      Copyright (C) 2009-2017 Stephan Raue (stephan@openelec.tv)
 #
 #  OpenELEC is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@ PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.openelec.tv"
 PKG_URL=""
-PKG_DEPENDS_TARGET="toolchain libc:init busybox:init linux:init plymouth-lite:init util-linux:init e2fsprogs:init dosfstools:init"
+PKG_DEPENDS_TARGET="toolchain libc:init busybox:init linux:init psplash:init util-linux:init e2fsprogs:init dosfstools:init"
 PKG_PRIORITY="optional"
 PKG_SECTION="virtual"
 PKG_SHORTDESC="initramfs: Metapackage for installing initramfs"
@@ -31,10 +31,6 @@ PKG_LONGDESC="debug is a Metapackage for installing initramfs"
 
 PKG_IS_ADDON="no"
 PKG_AUTORECONF="no"
-
-if [ "$ISCSI_SUPPORT" = yes ]; then
-  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET open-iscsi:init"
-fi
 
 if [ "$INITRAMFS_PARTED_SUPPORT" = yes ]; then
   PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET util-linux:init"
@@ -47,7 +43,13 @@ post_install() {
     if [ "$TARGET_ARCH" = "x86_64" -o "$TARGET_ARCH" = "powerpc64" ]; then
       ln -s /lib $ROOT/$BUILD/initramfs/lib64
     fi
+
     mkdir -p $ROOT/$BUILD/image/
-    find . | cpio -H newc -ov -R 0:0 > $ROOT/$BUILD/image/initramfs.cpio
+      echo "find . | cpio -H newc -ov -R 0:0 > $ROOT/$BUILD/image/initramfs.cpio" >> $FAKEROOT_SCRIPT_INIT
+
+    # run fakeroot
+      chmod +x $FAKEROOT_SCRIPT_INIT
+      $ROOT/$TOOLCHAIN/bin/fakeroot -- $FAKEROOT_SCRIPT_INIT
+      rm -rf $FAKEROOT_SCRIPT_INIT
   cd -
 }

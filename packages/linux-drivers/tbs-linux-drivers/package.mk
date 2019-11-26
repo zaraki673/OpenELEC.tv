@@ -1,6 +1,6 @@
 ################################################################################
 #      This file is part of OpenELEC - http://www.openelec.tv
-#      Copyright (C) 2009-2014 Stephan Raue (stephan@openelec.tv)
+#      Copyright (C) 2009-2017 Stephan Raue (stephan@openelec.tv)
 #
 #  OpenELEC is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="tbs-linux-drivers"
-PKG_VERSION="141225"
+PKG_VERSION="160126"
 PKG_REV="1"
 PKG_ARCH="x86_64"
 PKG_LICENSE="GPL"
@@ -41,13 +41,13 @@ post_unpack() {
 make_target() {
   cd $ROOT/$PKG_BUILD/linux-tbs-drivers
   ./v4l/tbs-x86_64.sh
-  LDFLAGS="" make DIR=$(kernel_path) prepare
-  LDFLAGS="" make DIR=$(kernel_path)
+  LDFLAGS="" make DIR=$(get_pkg_build linux) prepare
+  LDFLAGS="" make DIR=$(get_pkg_build linux)
 }
 
 makeinstall_target() {
   mkdir -p $INSTALL/lib/modules/$(get_module_dir)/updates/tbs
-  find $ROOT/$PKG_BUILD/linux-tbs-drivers/ -name \*.ko -exec cp {} $INSTALL/lib/modules/$(get_module_dir)/updates/tbs \;
-  mkdir -p $INSTALL/lib/firmware/
-  cp $ROOT/$PKG_BUILD/*.fw $INSTALL/lib/firmware/
+  find $ROOT/$PKG_BUILD/linux-tbs-drivers/ -name \*.ko -exec cp {} $INSTALL/usr/lib/modules/$(get_module_dir)/updates/tbs \;
+  mkdir -p $INSTALL/usr/lib/firmware/
+  cp $ROOT/$PKG_BUILD/*.fw $INSTALL/usr/lib/firmware/
 }

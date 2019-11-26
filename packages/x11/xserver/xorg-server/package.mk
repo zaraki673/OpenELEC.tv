@@ -1,6 +1,6 @@
 ################################################################################
 #      This file is part of OpenELEC - http://www.openelec.tv
-#      Copyright (C) 2009-2014 Stephan Raue (stephan@openelec.tv)
+#      Copyright (C) 2009-2017 Stephan Raue (stephan@openelec.tv)
 #
 #  OpenELEC is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -17,13 +17,13 @@
 ################################################################################
 
 PKG_NAME="xorg-server"
-PKG_VERSION="1.16.4"
+PKG_VERSION="1.19.3"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="OSS"
 PKG_SITE="http://www.X.org"
 PKG_URL="http://xorg.freedesktop.org/archive/individual/xserver/$PKG_NAME-$PKG_VERSION.tar.bz2"
-PKG_DEPENDS_TARGET="toolchain util-macros font-util fontsproto randrproto recordproto renderproto dri2proto dri3proto fixesproto damageproto videoproto inputproto xf86dgaproto xf86vidmodeproto xf86driproto xf86miscproto presentproto libpciaccess libX11 libXfont libXinerama libxshmfence libxkbfile libdrm libressl freetype pixman fontsproto systemd xorg-launch-helper"
+PKG_DEPENDS_TARGET="toolchain util-macros font-util fontsproto randrproto recordproto renderproto dri2proto dri3proto fixesproto damageproto videoproto inputproto xf86dgaproto xf86vidmodeproto xf86driproto xf86miscproto presentproto libpciaccess libX11 libXfont2 libXinerama libxshmfence libxkbfile libdrm libressl freetype pixman fontsproto systemd xorg-launch-helper"
 PKG_PRIORITY="optional"
 PKG_SECTION="x11/xserver"
 PKG_SHORTDESC="xorg-server: The Xorg X server"
@@ -34,15 +34,8 @@ PKG_AUTORECONF="yes"
 
 get_graphicdrivers
 
-if [ "$COMPOSITE_SUPPORT" = "yes" ]; then
-  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET libXcomposite"
-  XORG_COMPOSITE="--enable-composite"
-else
-  XORG_COMPOSITE="--disable-composite"
-fi
-
-if [ ! "$OPENGL" = "no" ]; then
-  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET glproto $OPENGL libepoxy glu"
+if [ "$OPENGL" = "mesa" ]; then
+  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET glproto opengl libepoxy glu"
   XORG_MESA="--enable-glx --enable-dri --enable-glamor"
 else
   XORG_MESA="--disable-glx --disable-dri --disable-glamor"
@@ -55,12 +48,8 @@ PKG_CONFIGURE_OPTS_TARGET="--disable-debug \
                            --enable-visibility \
                            --disable-unit-tests \
                            --disable-sparkle \
-                           --disable-install-libxf86config \
                            --disable-xselinux \
-                           --enable-aiglx \
-                           --enable-glx-tls \
-                           --enable-registry \
-                           $XORG_COMPOSITE \
+                           --disable-composite \
                            --enable-mitshm \
                            --disable-xres \
                            --enable-record \
@@ -113,6 +102,7 @@ PKG_CONFIGURE_OPTS_TARGET="--disable-debug \
                            --disable-kdrive-mouse \
                            --disable-kdrive-evdev \
                            --disable-libunwind \
+                           --enable-xshmfence \
                            --disable-install-setuid \
                            --enable-unix-transport \
                            --disable-tcp-transport \
@@ -120,6 +110,7 @@ PKG_CONFIGURE_OPTS_TARGET="--disable-debug \
                            --disable-local-transport \
                            --disable-secure-rpc \
                            --enable-xtrans-send-fds \
+                           --enable-input-thread \
                            --disable-docs \
                            --disable-devel-docs \
                            --with-int10=x86emu \
@@ -127,13 +118,14 @@ PKG_CONFIGURE_OPTS_TARGET="--disable-debug \
                            --with-sha1=libcrypto \
                            --without-systemd-daemon \
                            --with-os-vendor=OpenELEC.tv \
-                           --with-module-dir=$XORG_PATH_MODULES \
-                           --with-xkb-path=$XORG_PATH_XKB \
+                           --with-module-dir=/usr/lib/xorg/modules \
+                           --with-xkb-path=/usr/share/X11/xkb \
                            --with-xkb-output=/var/cache/xkb \
                            --with-log-dir=/var/log \
                            --with-fontrootdir=/usr/share/fonts \
                            --with-default-font-path=/usr/share/fonts/misc,built-ins \
                            --with-serverconfig-path=/usr/lib/xserver \
+                           --without-doxygen \
                            --without-xmlto \
                            --without-fop"
 
@@ -148,6 +140,11 @@ post_makeinstall_target() {
 
   mkdir -p $INSTALL/usr/lib/xorg
     cp -P $PKG_DIR/scripts/xorg-configure $INSTALL/usr/lib/xorg
+      . $ROOT/packages/x11/driver/xf86-video-nvidia/package.mk
+      sed -i -e "s|@NVIDIA_VERSION@|${PKG_VERSION}|g" $INSTALL/usr/lib/xorg/xorg-configure
+      . $ROOT/packages/x11/driver/xf86-video-nvidia-legacy/package.mk
+      sed -i -e "s|@NVIDIA_LEGACY_VERSION@|${PKG_VERSION}|g" $INSTALL/usr/lib/xorg/xorg-configure
+      . $ROOT/packages/x11/xserver/xorg-server/package.mk
 
   if [ ! "$OPENGL" = "no" ]; then
     if [ -f $INSTALL/usr/lib/xorg/modules/extensions/libglx.so ]; then

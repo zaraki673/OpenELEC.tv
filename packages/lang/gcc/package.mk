@@ -1,6 +1,6 @@
 ################################################################################
 #      This file is part of OpenELEC - http://www.openelec.tv
-#      Copyright (C) 2009-2014 Stephan Raue (stephan@openelec.tv)
+#      Copyright (C) 2009-2017 Stephan Raue (stephan@openelec.tv)
 #
 #  OpenELEC is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -17,12 +17,12 @@
 ################################################################################
 
 PKG_NAME="gcc"
-PKG_VERSION="4.9.2"
+PKG_VERSION="6.3.0"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://gcc.gnu.org/"
-PKG_URL="ftp://ftp.gnu.org/gnu/gcc/$PKG_NAME-$PKG_VERSION/$PKG_NAME-$PKG_VERSION.tar.bz2"
+PKG_URL="http://ftp.gnu.org/gnu/gcc/$PKG_NAME-$PKG_VERSION/$PKG_NAME-$PKG_VERSION.tar.bz2"
 PKG_DEPENDS_BOOTSTRAP="ccache:host autoconf:host binutils:host gmp:host mpfr:host mpc:host"
 PKG_DEPENDS_TARGET="gcc:host"
 PKG_DEPENDS_HOST="ccache:host autoconf:host binutils:host gmp:host mpfr:host mpc:host glibc"
@@ -34,67 +34,57 @@ PKG_LONGDESC="This package contains the GNU Compiler Collection. It includes com
 PKG_IS_ADDON="no"
 PKG_AUTORECONF="no"
 
-BOOTSTRAP_CONFIGURE_OPTS="--host=$HOST_NAME \
-                          --build=$HOST_NAME \
-                          --target=$TARGET_NAME \
-                          --prefix=$ROOT/$TOOLCHAIN \
-                          --with-sysroot=$SYSROOT_PREFIX \
-                          --with-gmp=$ROOT/$TOOLCHAIN \
-                          --with-mpfr=$ROOT/$TOOLCHAIN \
-                          --with-mpc=$ROOT/$TOOLCHAIN \
-                          --without-ppl \
-                          --without-cloog \
-                          --with-gnu-as \
-                          --with-gnu-ld \
-                          --enable-languages=c \
-                          --disable-__cxa_atexit \
-                          --disable-libada \
-                          --disable-libmudflap \
-                          --disable-libatomic \
-                          --disable-libitm \
-                          --disable-libsanitizer \
-                          --enable-gold \
-                          --enable-ld=default \
-                          --enable-plugin \
-                          --enable-lto \
-                          --disable-libquadmath \
-                          --disable-libssp \
-                          --disable-libgomp \
-                          --enable-cloog-backend=isl \
-                          --disable-shared \
-                          --disable-multilib \
-                          --disable-threads \
-                          --without-headers \
-                          --with-newlib \
-                          --disable-decimal-float \
-                          $GCC_OPTS \
-                          --disable-nls \
-                          --enable-checking=release"
+# Some target need gcc/libatomic:
+if [ "GCC_LIBATOMIC_SUPPORT" = "yes" ]; then
+  GCC_LIBATOMIC="--enable-libatomic"
+else
+  GCC_LIBATOMIC="--disable-libatomic"
+fi
 
-PKG_CONFIGURE_OPTS_HOST="--target=$TARGET_NAME \
-                         --with-sysroot=$SYSROOT_PREFIX \
-                         --with-gmp=$ROOT/$TOOLCHAIN \
-                         --with-mpfr=$ROOT/$TOOLCHAIN \
-                         --with-mpc=$ROOT/$TOOLCHAIN \
-                         --without-ppl \
-                         --without-cloog \
-                         --enable-languages=${TOOLCHAIN_LANGUAGES} \
-                         --with-gnu-as \
-                         --with-gnu-ld \
+GCC_COMMON_CONFIGURE_OPTS="--target=$TARGET_NAME \
+                           --with-sysroot=$SYSROOT_PREFIX \
+                           --with-gmp=$ROOT/$TOOLCHAIN \
+                           --with-mpfr=$ROOT/$TOOLCHAIN \
+                           --with-mpc=$ROOT/$TOOLCHAIN \
+                           --with-gnu-as \
+                           --with-gnu-ld \
+                           --enable-plugin \
+                           --enable-lto \
+                           --enable-gold \
+                           --enable-ld=default \
+                           --disable-multilib \
+                           --disable-nls \
+                           --enable-checking=release \
+                           --with-default-libstdcxx-abi=gcc4-compatible \
+                           --without-ppl \
+                           --without-cloog \
+                           --disable-libada \
+                           --disable-libmudflap \
+                           --disable-libitm \
+                           --disable-libquadmath \
+                           --disable-libgomp \
+                           --disable-libmpx"
+
+PKG_CONFIGURE_OPTS_BOOTSTRAP="$GCC_COMMON_CONFIGURE_OPTS \
+                              --disable-libatomic \
+                              --enable-languages=c \
+                              --disable-__cxa_atexit \
+                              --disable-libsanitizer \
+                              --disable-libssp \
+                              --enable-cloog-backend=isl \
+                              --disable-shared \
+                              --disable-threads \
+                              --without-headers \
+                              --with-newlib \
+                              --disable-decimal-float \
+                              $GCC_OPTS"
+
+PKG_CONFIGURE_OPTS_HOST="$GCC_COMMON_CONFIGURE_OPTS \
+                         $GCC_LIBATOMIC \
+                         --enable-languages=c,c++ \
                          --enable-__cxa_atexit \
-                         --disable-libada \
                          --enable-decimal-float \
-                         --disable-libmudflap \
-                         --disable-libssp \
-                         --disable-multilib \
-                         --disable-libatomic \
-                         --disable-libitm \
-                         --enable-gold \
-                         --enable-ld=default \
-                         --enable-plugin \
-                         --enable-lto \
-                         --disable-libquadmath \
-                         --disable-libgomp \
+                         --enable-libssp \
                          --enable-tls \
                          --enable-shared \
                          --disable-static \
@@ -104,16 +94,11 @@ PKG_CONFIGURE_OPTS_HOST="--target=$TARGET_NAME \
                          --disable-libstdcxx-pch \
                          --enable-libstdcxx-time \
                          --enable-clocale=gnu \
-                         $GCC_OPTS \
-                         --disable-nls \
-                         --enable-checking=release"
+                         $GCC_OPTS"
 
-pre_configure_bootstrap() {
-  setup_toolchain host
-}
-
-makeinstall_bootstrap() {
-  make install
+pre_configure_host() {
+  export CXXFLAGS="$CXXFLAGS -std=gnu++98"
+  unset CPP
 }
 
 post_make_host() {
@@ -122,42 +107,19 @@ post_make_host() {
   ln -sf libgcc_s.so.1 $TARGET_NAME/libgcc/libgcc_s.so
 
   if [ ! "$DEBUG" = yes ]; then
-    $TARGET_STRIP $TARGET_NAME/libgcc/libgcc_s.so*
-    $TARGET_STRIP $TARGET_NAME/libstdc++-v3/src/.libs/libstdc++.so*
+    ${TARGET_NAME}-strip $TARGET_NAME/libgcc/libgcc_s.so*
+    ${TARGET_NAME}-strip $TARGET_NAME/libstdc++-v3/src/.libs/libstdc++.so*
   fi
 }
 
 post_makeinstall_host() {
-  cp -PR $TARGET_NAME/libstdc++-v3/src/.libs/libstdc++.so* $SYSROOT_PREFIX/usr/lib
+  mkdir -p $SYSROOT_PREFIX/usr/lib
+    cp -PR $TARGET_NAME/libstdc++-v3/src/.libs/libstdc++.so* $SYSROOT_PREFIX/usr/lib
+    cp -PR $TARGET_NAME/libssp/.libs/libssp.so* $SYSROOT_PREFIX/usr/lib
 
-  GCC_VERSION=`$ROOT/$TOOLCHAIN/bin/${TARGET_NAME}-gcc -dumpversion`
-  DATE="0501`echo $GCC_VERSION | sed 's/\([0-9]\)/0\1/g' | sed 's/\.//g'`"
-  CROSS_CC=$TARGET_CC-$GCC_VERSION
-  CROSS_CXX=$TARGET_CXX-$GCC_VERSION
-
-  rm -f $TARGET_CC
-
-cat > $TARGET_CC <<EOF
-#!/bin/sh
-$ROOT/$TOOLCHAIN/bin/ccache $CROSS_CC "\$@"
-EOF
-
-  chmod +x $TARGET_CC
-
-  # To avoid cache trashing
-  touch -c -t $DATE $CROSS_CC
-
-  [ ! -f "$CROSS_CXX" ] && mv $TARGET_CXX $CROSS_CXX
-
-cat > $TARGET_CXX <<EOF
-#!/bin/sh
-$ROOT/$TOOLCHAIN/bin/ccache $CROSS_CXX "\$@"
-EOF
-
-  chmod +x $TARGET_CXX
-
-  # To avoid cache trashing
-  touch -c -t $DATE $CROSS_CXX
+  mkdir -p $ROOT/$TOOLCHAIN/lib/ccache
+    ln -sf $ROOT/$TOOLCHAIN/bin/ccache $ROOT/$TOOLCHAIN/lib/ccache/${TARGET_NAME}-gcc
+    ln -sf $ROOT/$TOOLCHAIN/bin/ccache $ROOT/$TOOLCHAIN/lib/ccache/${TARGET_NAME}-g++
 }
 
 configure_target() {
@@ -169,8 +131,10 @@ make_target() {
 }
 
 makeinstall_target() {
+  mkdir -p $INSTALL/lib
+    cp -P $ROOT/$PKG_BUILD/.$HOST_NAME/$TARGET_NAME/libgcc/libgcc_s.so* $INSTALL/lib
+    cp -P $ROOT/$PKG_BUILD/.$HOST_NAME/$TARGET_NAME/libssp/.libs/libssp.so* $INSTALL/lib
   mkdir -p $INSTALL/usr/lib
-    cp -P $ROOT/$PKG_BUILD/.$HOST_NAME/$TARGET_NAME/libgcc/libgcc_s.so* $INSTALL/usr/lib
     cp -P $ROOT/$PKG_BUILD/.$HOST_NAME/$TARGET_NAME/libstdc++-v3/src/.libs/libstdc++.so* $INSTALL/usr/lib
 }
 
@@ -185,4 +149,5 @@ make_init() {
 makeinstall_init() {
   mkdir -p $INSTALL/lib
     cp -P $ROOT/$PKG_BUILD/.$HOST_NAME/$TARGET_NAME/libgcc/libgcc_s.so* $INSTALL/lib
+    cp -P $ROOT/$PKG_BUILD/.$HOST_NAME/$TARGET_NAME/libssp/.libs/libssp.so* $INSTALL/lib
 }

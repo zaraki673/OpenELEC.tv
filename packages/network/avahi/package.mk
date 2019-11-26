@@ -1,6 +1,6 @@
 ################################################################################
 #      This file is part of OpenELEC - http://www.openelec.tv
-#      Copyright (C) 2009-2014 Stephan Raue (stephan@openelec.tv)
+#      Copyright (C) 2009-2017 Stephan Raue (stephan@openelec.tv)
 #
 #  OpenELEC is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="avahi"
-PKG_VERSION="0.6.31"
+PKG_VERSION="0.6.32"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
@@ -30,7 +30,8 @@ PKG_SHORTDESC="avahi: A Zeroconf mDNS/DNS-SD responder"
 PKG_LONGDESC="Avahi is a framework for Multicast DNS Service Discovery (mDNS/DNS-SD a.k.a. Zeroconf) on Linux. It allows programs to publish and discover services running on a local network with no specific configuration. For example, you can plug into a network and instantly find printers to print to, files to look at, and people to talk to."
 
 PKG_IS_ADDON="no"
-PKG_AUTORECONF="yes"
+#broken
+PKG_AUTORECONF="no"
 
 MAKEFLAGS="-j1"
 
@@ -75,6 +76,10 @@ PKG_CONFIGURE_OPTS_TARGET="py_cv_mod_gtk_=yes \
                            --with-avahi-group=avahi \
                            --disable-nls"
 
+pre_configure_target() {
+  NOCONFIGURE=1 ./autogen.sh
+}
+
 post_makeinstall_target() {
 # for some reason avai can fail to start see: http://forums.gentoo.org/viewtopic-p-7322172.html#7322172
   sed -e "s,^.*disallow-other-stacks=.*$,disallow-other-stacks=yes,g" -i $INSTALL/etc/avahi/avahi-daemon.conf
@@ -101,7 +106,6 @@ post_makeinstall_target() {
 
   mkdir -p $INSTALL/usr/share/services
     cp -P $PKG_DIR/default.d/*.conf $INSTALL/usr/share/services
-
 }
 
 post_install() {

@@ -1,6 +1,6 @@
 ################################################################################
 #      This file is part of OpenELEC - http://www.openelec.tv
-#      Copyright (C) 2009-2014 Stephan Raue (stephan@openelec.tv)
+#      Copyright (C) 2009-2017 Stephan Raue (stephan@openelec.tv)
 #
 #  OpenELEC is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -17,13 +17,13 @@
 ################################################################################
 
 PKG_NAME="mesa"
-PKG_VERSION="10.5.5"
+PKG_VERSION="17.0.3"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="OSS"
 PKG_SITE="http://www.mesa3d.org/"
-PKG_URL="ftp://freedesktop.org/pub/mesa/$PKG_VERSION/$PKG_NAME-$PKG_VERSION.tar.xz"
-PKG_DEPENDS_TARGET="toolchain Python:host expat glproto dri2proto presentproto libdrm libXext libXdamage libXfixes libXxf86vm libxcb libX11 systemd dri3proto libxshmfence"
+PKG_URL="ftp://freedesktop.org/pub/mesa/$PKG_NAME-$PKG_VERSION.tar.xz"
+PKG_DEPENDS_TARGET="toolchain Python:host expat glproto dri2proto presentproto libdrm libXext libXdamage libXfixes libXxf86vm libxcb libX11 dri3proto libxshmfence zlib"
 PKG_PRIORITY="optional"
 PKG_SECTION="graphics"
 PKG_SHORTDESC="mesa: 3-D graphics library with OpenGL API"
@@ -43,7 +43,7 @@ else
   MESA_GALLIUM_LLVM="--disable-gallium-llvm"
 fi
 
-if [ "$VDPAU_SUPPORT" = "yes" ]; then
+if [ "$VDPAU_SUPPORT" = "yes" -a "$DISPLAYSERVER" = "x11" ]; then
   PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET libvdpau"
   MESA_VDPAU="--enable-vdpau"
 else
@@ -56,19 +56,23 @@ PKG_CONFIGURE_OPTS_TARGET="CC_FOR_BUILD=$HOST_CC \
                            CXXFLAGS_FOR_BUILD= \
                            LDFLAGS_FOR_BUILD= \
                            X11_INCLUDES= \
-                           DRI_DRIVER_INSTALL_DIR=$XORG_PATH_DRI \
-                           DRI_DRIVER_SEARCH_DIR=$XORG_PATH_DRI \
+                           DRI_DRIVER_INSTALL_DIR=/usr/lib/dri \
+                           DRI_DRIVER_SEARCH_DIR=/usr/lib/dri \
+                           --disable-silent-rules \
                            --disable-debug \
+                           --disable-profile \
+                           --disable-libglvnd \
                            --disable-mangling \
                            --enable-texture-float \
                            --enable-asm \
                            --disable-selinux \
                            --enable-opengl \
                            --disable-gles1 \
-                           --disable-gles2 \
-                           --disable-openvg \
+                           --enable-gles2 \
                            --enable-dri \
-                           --disable-dri3 \
+                           --disable-gallium-extra-hud \
+                           --disable-lmsensors \
+                           --enable-dri3 \
                            --enable-glx \
                            --disable-osmesa \
                            --disable-gallium-osmesa \
@@ -80,23 +84,26 @@ PKG_CONFIGURE_OPTS_TARGET="CC_FOR_BUILD=$HOST_CC \
                            $MESA_VDPAU \
                            --disable-omx \
                            --disable-va \
-                           --disable-opencl \
-                           --enable-opencl-icd \
-                           --disable-xlib-glx \
-                           --disable-r600-llvm-compiler \
+                           --disable-opencl --disable-opencl-icd \
                            --disable-gallium-tests \
                            --enable-shared-glapi \
-                           --enable-shader-cache \
-                           --enable-sysfs \
                            --enable-driglx-direct \
                            --enable-glx-tls \
+                           --disable-glx-read-only-text \
                            $MESA_GALLIUM_LLVM \
-                           --disable-silent-rules \
+                           --disable-valgrind \
+                           --with-sysroot=$SYSROOT_PREFIX \
                            --with-gl-lib-name=GL \
                            --with-osmesa-lib-name=OSMesa \
                            --with-gallium-drivers=$GALLIUM_DRIVERS \
+                           --with-dri-driverdir=/usr/lib/dri \
+                           --with-dri-searchpath=/usr/lib/dri \
                            --with-dri-drivers=$DRI_DRIVERS \
-                           --with-sysroot=$SYSROOT_PREFIX"
+                           --without-vulkan-drivers"
+
+pre_configure_target() {
+  export LIBS="-lxcb-dri3 -lxcb-present -lxcb-sync -lxshmfence -lz"
+}
 
 post_makeinstall_target() {
   # rename and relink for cooperate with nvidia drivers

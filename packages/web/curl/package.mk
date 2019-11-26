@@ -1,6 +1,6 @@
 ################################################################################
 #      This file is part of OpenELEC - http://www.openelec.tv
-#      Copyright (C) 2009-2014 Stephan Raue (stephan@openelec.tv)
+#      Copyright (C) 2009-2017 Stephan Raue (stephan@openelec.tv)
 #
 #  OpenELEC is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@
 #   there: http://forum.xbmc.org/showthread.php?tid=177557
 
 PKG_NAME="curl"
-PKG_VERSION="7.42.1"
+PKG_VERSION="7.53.1"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="MIT"
@@ -38,6 +38,7 @@ PKG_SHORTDESC="curl: Client and library for (HTTP, HTTPS, FTP, ...) transfers"
 PKG_LONGDESC="Curl is a client to get documents/files from or send documents to a server, using any of the supported protocols (HTTP, HTTPS, FTP, FTPS, GOPHER, DICT, TELNET, LDAP or FILE). The command is designed to work without user interaction or any kind of interactivity."
 
 PKG_IS_ADDON="no"
+PKG_USE_CMAKE="no"
 PKG_AUTORECONF="yes"
 
 PKG_CONFIGURE_OPTS_TARGET="ac_cv_lib_rtmp_RTMP_Init=yes \
@@ -50,7 +51,7 @@ PKG_CONFIGURE_OPTS_TARGET="ac_cv_lib_rtmp_RTMP_Init=yes \
                            --enable-largefile \
                            --enable-http \
                            --enable-ftp \
-                           --enable-file \
+                           --disable-file \
                            --disable-ldap \
                            --disable-ldaps \
                            --enable-rtsp \
@@ -60,8 +61,9 @@ PKG_CONFIGURE_OPTS_TARGET="ac_cv_lib_rtmp_RTMP_Init=yes \
                            --disable-tftp \
                            --disable-pop3 \
                            --disable-imap \
+                           --disable-smb \
                            --disable-smtp \
-                           --disable-gophper \
+                           --disable-gopher \
                            --disable-manual \
                            --enable-libgcc \
                            --enable-ipv6 \
@@ -72,7 +74,7 @@ PKG_CONFIGURE_OPTS_TARGET="ac_cv_lib_rtmp_RTMP_Init=yes \
                            --disable-sspi \
                            --enable-crypto-auth \
                            --enable-cookies \
-                           --enable-hidden-symbols \
+                           --enable-symbol-hiding \
                            --disable-soname-bump \
                            --with-gnu-ld \
                            --without-krb4 \
@@ -86,8 +88,10 @@ PKG_CONFIGURE_OPTS_TARGET="ac_cv_lib_rtmp_RTMP_Init=yes \
                            --with-ssl \
                            --without-polarssl \
                            --without-nss \
-                           --with-ca-bundle=$SSL_CERTIFICATES/cacert.pem \
+                           --with-ca-bundle=/usr/etc/ssl/cert.pem \
                            --without-ca-path \
+                           --without-libpsl \
+                           --without-libmetalink \
                            --without-libssh2 \
                            --with-librtmp=$SYSROOT_PREFIX/usr \
                            --without-libidn"
@@ -98,8 +102,8 @@ pre_configure_target() {
 }
 
 post_makeinstall_target() {
+  rm -rf $INSTALL/usr/share/zsh
   rm -rf $INSTALL/usr/bin/curl-config
 
   sed -e "s:\(['= ]\)/usr:\\1$SYSROOT_PREFIX/usr:g" -i $SYSROOT_PREFIX/usr/bin/curl-config
-  mv $SYSROOT_PREFIX/usr/bin/curl-config $ROOT/$TOOLCHAIN/bin
 }

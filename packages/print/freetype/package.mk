@@ -1,6 +1,6 @@
 ################################################################################
 #      This file is part of OpenELEC - http://www.openelec.tv
-#      Copyright (C) 2009-2014 Stephan Raue (stephan@openelec.tv)
+#      Copyright (C) 2009-2017 Stephan Raue (stephan@openelec.tv)
 #
 #  OpenELEC is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -17,13 +17,13 @@
 ################################################################################
 
 PKG_NAME="freetype"
-PKG_VERSION="2.5.5"
+PKG_VERSION="2.7.1"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.freetype.org"
-PKG_URL="http://download.savannah.gnu.org/releases/freetype/$PKG_NAME-$PKG_VERSION.tar.bz2"
-PKG_DEPENDS_TARGET="toolchain zlib libpng"
+PKG_URL="http://downloads.sourceforge.net/freetype/$PKG_NAME-$PKG_VERSION.tar.bz2"
+PKG_DEPENDS_TARGET="toolchain zlib"
 PKG_PRIORITY="optional"
 PKG_SECTION="print"
 PKG_SHORTDESC="freetype: TrueType font rendering library"
@@ -31,13 +31,18 @@ PKG_LONGDESC="The FreeType engine is a free and portable TrueType font rendering
 
 PKG_IS_ADDON="no"
 PKG_AUTORECONF="no"
+PKG_USE_CMAKE="no"
 
 # package specific configure options
-PKG_CONFIGURE_OPTS_TARGET="LIBPNG_CFLAGS=-I$SYSROOT_PREFIX/usr/include \
-                           LIBPNG_LDFLAGS=-L$SYSROOT_PREFIX/usr/lib \
-                           --with-zlib"
+PKG_CONFIGURE_OPTS_TARGET="--enable-static \
+                           --disable-shared \
+                           --with-zlib=yes \
+                           --with-bzip2=no \
+                           --with-png=no \
+                           --with-harfbuzz=no"
 
 pre_configure_target() {
+  CFLAGS="$CFLAGS -fPIC"
   # unset LIBTOOL because freetype uses its own
     ( cd ..
       unset LIBTOOL
@@ -47,7 +52,6 @@ pre_configure_target() {
 
 post_makeinstall_target() {
   $SED "s:\(['=\" ]\)/usr:\\1$SYSROOT_PREFIX/usr:g" $SYSROOT_PREFIX/usr/bin/freetype-config
-  cp $SYSROOT_PREFIX/usr/bin/freetype-config $ROOT/$TOOLCHAIN/bin
   ln -v -sf $SYSROOT_PREFIX/usr/include/freetype2 $SYSROOT_PREFIX/usr/include/freetype
 
   rm -rf $INSTALL/usr/bin

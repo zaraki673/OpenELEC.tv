@@ -1,6 +1,6 @@
 ################################################################################
 #      This file is part of OpenELEC - http://www.openelec.tv
-#      Copyright (C) 2009-2014 Stephan Raue (stephan@openelec.tv)
+#      Copyright (C) 2009-2017 Stephan Raue (stephan@openelec.tv)
 #
 #  OpenELEC is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -17,9 +17,9 @@
 ################################################################################
 
 PKG_NAME="wetekdvb"
-PKG_VERSION="20150503"
+PKG_VERSION="20170116"
 PKG_REV="1"
-PKG_ARCH="arm"
+PKG_ARCH="arm aarch64"
 PKG_LICENSE="nonfree"
 PKG_SITE="http://www.wetek.com/"
 PKG_URL="$DISTRO_SRC/$PKG_NAME-$PKG_VERSION.tar.xz"
@@ -33,14 +33,20 @@ PKG_LONGDESC="These package contains Wetek's DVB driver "
 PKG_IS_ADDON="no"
 PKG_AUTORECONF="no"
 
+if [ $LINUX = "amlogic-3.10" ]; then
+  WETEK_DVB_MODULE="wetekdvb.ko"
+elif [ $LINUX = "amlogic-3.14" ]; then
+  WETEK_DVB_MODULE="wetekdvb_play2.ko"
+fi
+
 make_target() {
   : # nothing todo
 }
 
 makeinstall_target() {
-  mkdir -p $INSTALL/lib/modules/$(get_module_dir)/$PKG_NAME
-    cp driver/*.ko $INSTALL/lib/modules/$(get_module_dir)/$PKG_NAME
+  mkdir -p $INSTALL/usr/lib/modules/$(get_module_dir)/$PKG_NAME
+    cp driver/$WETEK_DVB_MODULE $INSTALL/usr/lib/modules/$(get_module_dir)/$PKG_NAME/wetekdvb.ko
 
-  mkdir -p $INSTALL/lib/firmware
-    cp firmware/* $INSTALL/lib/firmware
+  mkdir -p $INSTALL/usr/lib/firmware
+    cp firmware/* $INSTALL/usr/lib/firmware
 }

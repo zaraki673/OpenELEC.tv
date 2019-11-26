@@ -1,6 +1,6 @@
 ################################################################################
 #      This file is part of OpenELEC - http://www.openelec.tv
-#      Copyright (C) 2009-2014 Stephan Raue (stephan@openelec.tv)
+#      Copyright (C) 2009-2017 Stephan Raue (stephan@openelec.tv)
 #
 #  OpenELEC is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -17,13 +17,13 @@
 ################################################################################
 
 PKG_NAME="libmicrohttpd"
-PKG_VERSION="0.9.41"
+PKG_VERSION="0.9.52"
 PKG_REV="1"
 PKG_ARCH="any"
-PKG_LICENSE="LGPL"
-PKG_SITE="http://www.gnu.org/software/libmicrohttpd/"
-PKG_URL="ftp://ftp.gnu.org/gnu/libmicrohttpd/$PKG_NAME-$PKG_VERSION.tar.gz"
-PKG_DEPENDS_TARGET="toolchain libgcrypt"
+PKG_LICENSE="LGPLv2.1"
+PKG_SITE="https://www.gnu.org/software/libmicrohttpd/"
+PKG_URL="https://ftp.gnu.org/gnu/libmicrohttpd/$PKG_NAME-$PKG_VERSION.tar.gz"
+PKG_DEPENDS_TARGET="toolchain"
 PKG_PRIORITY="optional"
 PKG_SECTION="web"
 PKG_SHORTDESC="libmicrohttpd: a small webserver C library"

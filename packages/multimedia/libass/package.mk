@@ -1,6 +1,6 @@
 ################################################################################
 #      This file is part of OpenELEC - http://www.openelec.tv
-#      Copyright (C) 2009-2014 Stephan Raue (stephan@openelec.tv)
+#      Copyright (C) 2009-2017 Stephan Raue (stephan@openelec.tv)
 #
 #  OpenELEC is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -17,13 +17,13 @@
 ################################################################################
 
 PKG_NAME="libass"
-PKG_VERSION="0.12.1"
+PKG_VERSION="0.13.6"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="BSD"
-PKG_SITE="http://code.google.com/p/libass/"
+PKG_SITE="https://github.com/libass/libass"
 PKG_URL="https://github.com/libass/libass/releases/download/$PKG_VERSION/$PKG_NAME-$PKG_VERSION.tar.xz"
-PKG_DEPENDS_TARGET="toolchain freetype fontconfig enca fribidi"
+PKG_DEPENDS_TARGET="toolchain freetype fontconfig fribidi"
 PKG_PRIORITY="optional"
 PKG_SECTION="multimedia"
 PKG_SHORTDESC="libass: a portable subtitle renderer for the ASS/SSA (Advanced Substation Alpha/Substation Alpha) subtitle format."
@@ -33,7 +33,6 @@ PKG_IS_ADDON="no"
 PKG_AUTORECONF="yes"
 
 PKG_CONFIGURE_OPTS_TARGET="--disable-test \
-                           --enable-enca \
                            --enable-fontconfig \
                            --disable-harfbuzz \
                            --disable-silent-rules \
@@ -41,6 +40,5 @@ PKG_CONFIGURE_OPTS_TARGET="--disable-test \
 
 if [ $TARGET_ARCH = "x86_64" ]; then
   PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET yasm:host"
-  PKG_CONFIGURE_OPTS_TARGET="$PKG_CONFIGURE_OPTS_TARGET --enable-asm"
+  PKG_CONFIGURE_OPTS_TARGET+=" --enable-asm"
 fi
-

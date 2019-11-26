@@ -1,6 +1,6 @@
 ################################################################################
 #      This file is part of OpenELEC - http://www.openelec.tv
-#      Copyright (C) 2009-2014 Stephan Raue (stephan@openelec.tv)
+#      Copyright (C) 2009-2017 Stephan Raue (stephan@openelec.tv)
 #
 #  OpenELEC is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -17,13 +17,13 @@
 ################################################################################
 
 PKG_NAME="glib"
-PKG_VERSION="2.42.2"
+PKG_VERSION="2.50.3"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="LGPL"
 PKG_SITE="http://www.gtk.org/"
-PKG_URL="http://ftp.gnome.org/pub/gnome/sources/glib/2.42/$PKG_NAME-$PKG_VERSION.tar.xz"
-PKG_DEPENDS_TARGET="toolchain zlib libffi pcre Python:host"
+PKG_URL="http://ftp.gnome.org/pub/gnome/sources/glib/2.50/$PKG_NAME-$PKG_VERSION.tar.xz"
+PKG_DEPENDS_TARGET="toolchain zlib libffi util-linux Python:host"
 PKG_PRIORITY="optional"
 PKG_SECTION="devel"
 PKG_SHORTDESC="glib: C support library"
@@ -52,7 +52,7 @@ PKG_CONFIGURE_OPTS_TARGET="ac_cv_func_mmap_fixed_mapped=yes \
                            --enable-Bsymbolic \
                            --with-gnu-ld \
                            --with-threads=posix \
-                           --with-pcre=system"
+                           --with-pcre=internal"
 
 post_makeinstall_target() {
   mkdir -p $SYSROOT_PREFIX/usr/lib/pkgconfig

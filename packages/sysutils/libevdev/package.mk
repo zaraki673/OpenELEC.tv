@@ -1,6 +1,6 @@
 ################################################################################
 #      This file is part of OpenELEC - http://www.openelec.tv
-#      Copyright (C) 2009-2014 Stephan Raue (stephan@openelec.tv)
+#      Copyright (C) 2009-2017 Stephan Raue (stephan@openelec.tv)
 #
 #  OpenELEC is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="libevdev"
-PKG_VERSION="1.4.2"
+PKG_VERSION="1.5.6"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
@@ -32,7 +32,7 @@ PKG_LONGDESC="libevdev is a wrapper library for evdev devices. it moves the comm
 PKG_IS_ADDON="no"
 PKG_AUTORECONF="yes"
 
-PKG_CONFIGURE_OPTS_TARGET="--enable-shared --disable-static"
+PKG_CONFIGURE_OPTS_TARGET="ac_cv_path_DOXYGEN=true --enable-shared --disable-static"
 
 pre_configure_target() {
   export CFLAGS="$CFLAGS -fPIC -DPIC"

@@ -1,6 +1,6 @@
 ################################################################################
 #      This file is part of OpenELEC - http://www.openelec.tv
-#      Copyright (C) 2009-2014 Stephan Raue (stephan@openelec.tv)
+#      Copyright (C) 2009-2017 Stephan Raue (stephan@openelec.tv)
 #
 #  OpenELEC is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@ PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="http://www.openelec.tv"
 PKG_URL=""
-PKG_DEPENDS_TARGET="toolchain eventlircd v4l-utils"
+PKG_DEPENDS_TARGET="toolchain eventlircd v4l-utils evtest"
 PKG_PRIORITY="optional"
 PKG_SECTION="virtual"
 PKG_SHORTDESC="remote: Meta package for installing various tools needed for remote support"
@@ -31,10 +31,6 @@ PKG_LONGDESC="Meta package for installing various tools needed for remote suppor
 
 PKG_IS_ADDON="no"
 PKG_AUTORECONF="no"
-
-if [ "$ATVCLIENT_SUPPORT" = "yes" ]; then
-  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET atvclient"
-fi
 
 if [ "$IRSERVER_SUPPORT" = "yes" ]; then
   PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET irserver"

@@ -1,6 +1,6 @@
 ################################################################################
 #      This file is part of OpenELEC - http://www.openelec.tv
-#      Copyright (C) 2009-2014 Stephan Raue (stephan@openelec.tv)
+#      Copyright (C) 2009-2017 Stephan Raue (stephan@openelec.tv)
 #
 #  OpenELEC is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -17,12 +17,12 @@
 ################################################################################
 
 PKG_NAME="dbus"
-PKG_VERSION="1.8.12"
+PKG_VERSION="1.10.16"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
-PKG_SITE="http://dbus.freedesktop.org"
-PKG_URL="http://dbus.freedesktop.org/releases/$PKG_NAME/$PKG_NAME-$PKG_VERSION.tar.gz"
+PKG_SITE="https://dbus.freedesktop.org"
+PKG_URL="https://dbus.freedesktop.org/releases/$PKG_NAME/$PKG_NAME-$PKG_VERSION.tar.gz"
 PKG_DEPENDS_TARGET="toolchain expat systemd"
 PKG_PRIORITY="required"
 PKG_SECTION="system"
@@ -48,7 +48,6 @@ PKG_CONFIGURE_OPTS_TARGET="export ac_cv_have_abstract_sockets=yes \
                            --disable-libaudit \
                            --enable-systemd \
                            --enable-inotify \
-                           --without-dbus-glib \
                            --without-valgrind \
                            --without-x \
                            --with-dbus-user=dbus"
@@ -63,6 +62,6 @@ post_install() {
   add_group dbus 81
   add_group netdev 497
 
-  echo "chmod 4750 $INSTALL/usr/lib/dbus/dbus-daemon-launch-helper" >> $FAKEROOT_SCRIPT
-  echo "chown 0:81 $INSTALL/usr/lib/dbus/dbus-daemon-launch-helper" >> $FAKEROOT_SCRIPT
+  echo "chmod 4750 $INSTALL/usr/lib/dbus/dbus-daemon-launch-helper" >> $FAKEROOT_SCRIPT_SYSTEM
+  echo "chown 0:81 $INSTALL/usr/lib/dbus/dbus-daemon-launch-helper" >> $FAKEROOT_SCRIPT_SYSTEM
 }

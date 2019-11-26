@@ -1,6 +1,6 @@
 ################################################################################
 #      This file is part of OpenELEC - http://www.openelec.tv
-#      Copyright (C) 2009-2014 Stephan Raue (stephan@openelec.tv)
+#      Copyright (C) 2009-2017 Stephan Raue (stephan@openelec.tv)
 #
 #  OpenELEC is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="imx-vpu"
-PKG_VERSION="3.10.17-1.0.0"
+PKG_VERSION="5.4.33"
 PKG_REV="1"
 PKG_ARCH="arm"
 PKG_LICENSE="other"
@@ -33,7 +33,7 @@ PKG_IS_ADDON="no"
 PKG_AUTORECONF="no"
 
 make_target() {
-  make DIRS="vpu" CFLAGS="$CFLAGS" PLATFORM=IMX6Q CROSS_COMPILE=$TARGET_PREFIX
+  make DIRS="vpu" CFLAGS="$CFLAGS" PLATFORM=IMX6Q
 }
 
 makeinstall_target() {

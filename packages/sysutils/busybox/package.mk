@@ -1,6 +1,6 @@
 ################################################################################
 #      This file is part of OpenELEC - http://www.openelec.tv
-#      Copyright (C) 2009-2014 Stephan Raue (stephan@openelec.tv)
+#      Copyright (C) 2009-2017 Stephan Raue (stephan@openelec.tv)
 #
 #  OpenELEC is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="busybox"
-PKG_VERSION="1.23.2"
+PKG_VERSION="1.26.2"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
@@ -36,20 +36,13 @@ PKG_AUTORECONF="no"
 
 PKG_MAKE_OPTS_HOST="ARCH=$TARGET_ARCH CROSS_COMPILE= KBUILD_VERBOSE=1 install"
 PKG_MAKE_OPTS_TARGET="ARCH=$TARGET_ARCH \
-                      HOSTCC=$HOST_CC \
-                      CROSS_COMPILE=$TARGET_PREFIX \
+                      CROSS_COMPILE=${TARGET_NAME}- \
                       KBUILD_VERBOSE=1 \
                       install"
 PKG_MAKE_OPTS_INIT="ARCH=$TARGET_ARCH \
-                    HOSTCC=$HOST_CC \
-                    CROSS_COMPILE=$TARGET_PREFIX \
+                    CROSS_COMPILE=${TARGET_NAME}- \
                     KBUILD_VERBOSE=1 \
                     install"
-
-# nano text editor
-  if [ "$NANO_EDITOR" = "yes" ]; then
-    PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET nano"
-  fi
 
 # nfs support
 if [ "$NFS_SUPPORT" = yes ]; then
@@ -66,6 +59,12 @@ if [ -f $PROJECT_DIR/$PROJECT/busybox/busybox-init.conf ]; then
   BUSYBOX_CFG_FILE_INIT=$PROJECT_DIR/$PROJECT/busybox/busybox-init.conf
 else
   BUSYBOX_CFG_FILE_INIT=$PKG_DIR/config/busybox-init.conf
+fi
+
+if [ -f $PROJECT_DIR/$PROJECT/busybox/init ]; then
+  BUSYBOX_INIT_FILE=$PROJECT_DIR/$PROJECT/busybox/init
+else
+  BUSYBOX_INIT_FILE=$PKG_DIR/scripts/init
 fi
 
 pre_build_target() {
@@ -149,9 +148,24 @@ configure_init() {
     make oldconfig
 }
 
+pre_make_host() {
+  # dont build parallel
+  MAKEFLAGS=-j1
+}
+
+pre_make_target() {
+  # dont build parallel
+  MAKEFLAGS=-j1
+}
+
+pre_make_init() {
+  # dont build parallel
+  MAKEFLAGS=-j1
+}
+
 makeinstall_host() {
-  mkdir -p $ROOT/$TOOLCHAIN/bin
-    cp -R $ROOT/$PKG_BUILD/.install_host/bin/* $ROOT/$TOOLCHAIN/bin
+  mkdir -p $ROOT/$TOOLCHAIN/
+    cp -PR $ROOT/$PKG_BUILD/.install_host/* $ROOT/$TOOLCHAIN/
 }
 
 makeinstall_target() {
@@ -167,6 +181,7 @@ makeinstall_target() {
 
   mkdir -p $INSTALL/usr/lib/openelec
     cp $PKG_DIR/scripts/fs-resize $INSTALL/usr/lib/openelec
+      sed -e "s/@DISTRONAME@/$DISTRONAME/g" -i $INSTALL/usr/lib/openelec/fs-resize
 
   mkdir -p $INSTALL/etc
     cp $PKG_DIR/config/profile $INSTALL/etc
@@ -182,9 +197,6 @@ makeinstall_target() {
 
   # /etc/machine-id, needed by systemd and dbus
     ln -sf /run/machine-id $INSTALL/etc/machine-id
-
-  # /etc/hosts must be writeable
-    ln -sf /var/cache/hosts $INSTALL/etc/hosts
 
   # /etc/mtab is needed by udisks etc...
     ln -sf /proc/self/mounts $INSTALL/etc/mtab
@@ -207,8 +219,8 @@ makeinstall_target() {
 post_install() {
   ROOT_PWD="`$ROOT/$TOOLCHAIN/bin/cryptpw -m sha512 $ROOT_PASSWORD`"
 
-  echo "chmod 4755 $INSTALL/bin/busybox" >> $FAKEROOT_SCRIPT
-  echo "chmod 000 $INSTALL/etc/shadow" >> $FAKEROOT_SCRIPT
+  echo "chmod 4755 $INSTALL/bin/busybox" >> $FAKEROOT_SCRIPT_SYSTEM
+  echo "chmod 000 $INSTALL/etc/shadow" >> $FAKEROOT_SCRIPT_SYSTEM
 
   add_user root "$ROOT_PWD" 0 0 "Root User" "/storage" "/bin/sh"
   add_group root 0
@@ -250,6 +262,7 @@ makeinstall_init() {
     chmod 755 $INSTALL/platform_init
   fi
 
-  cp $PKG_DIR/scripts/init $INSTALL
+  cp $BUSYBOX_INIT_FILE $INSTALL
+    sed -e "s/@DISTRONAME@/$DISTRONAME/g" -i $INSTALL/init
   chmod 755 $INSTALL/init
 }

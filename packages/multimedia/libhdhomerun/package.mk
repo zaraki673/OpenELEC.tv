@@ -1,6 +1,6 @@
 ################################################################################
 #      This file is part of OpenELEC - http://www.openelec.tv
-#      Copyright (C) 2009-2014 Stephan Raue (stephan@openelec.tv)
+#      Copyright (C) 2009-2017 Stephan Raue (stephan@openelec.tv)
 #
 #  OpenELEC is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="libhdhomerun"
-PKG_VERSION="20150406"
+PKG_VERSION="20150826"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="LGPL"
@@ -33,7 +33,7 @@ PKG_LONGDESC="The library provides functionality to setup the HDHomeRun, change 
 PKG_IS_ADDON="no"
 PKG_AUTORECONF="no"
 
-PKG_MAKE_OPTS_TARGET="CROSS_COMPILE=$TARGET_PREFIX"
+PKG_MAKE_OPTS_TARGET="CROSS_COMPILE=${TARGET_NAME}-"
 
 makeinstall_target() {
   mkdir -p $INSTALL/usr/bin
@@ -41,4 +41,10 @@ makeinstall_target() {
 
   mkdir -p $INSTALL/usr/lib/
     cp -PR libhdhomerun.so $INSTALL/usr/lib/
+
+  mkdir -p $SYSROOT_PREFIX/usr/include/hdhomerun
+    cp *.h $SYSROOT_PREFIX/usr/include/hdhomerun
+
+  mkdir -p $SYSROOT_PREFIX/usr/lib
+    cp libhdhomerun.so $SYSROOT_PREFIX/usr/lib
 }

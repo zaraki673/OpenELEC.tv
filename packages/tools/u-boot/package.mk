@@ -1,6 +1,6 @@
 ################################################################################
 #      This file is part of OpenELEC - http://www.openelec.tv
-#      Copyright (C) 2009-2014 Stephan Raue (stephan@openelec.tv)
+#      Copyright (C) 2009-2017 Stephan Raue (stephan@openelec.tv)
 #
 #  OpenELEC is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -22,14 +22,15 @@ if [ "$UBOOT_VERSION" = "default" ]; then
   PKG_SITE="http://www.denx.de/wiki/U-Boot/WebHome"
   PKG_URL="ftp://ftp.denx.de/pub/u-boot/$PKG_NAME-$PKG_VERSION.tar.bz2"
 elif [ "$UBOOT_VERSION" = "imx6-cuboxi" ]; then
-  PKG_VERSION="imx6-144b1e9"
+  PKG_VERSION="10acd12"
   PKG_SITE="http://imx.solid-run.com/wiki/index.php?title=Building_the_kernel_and_u-boot_for_the_CuBox-i_and_the_HummingBoard"
-  PKG_URL="$DISTRO_SRC/$PKG_NAME-$PKG_VERSION.tar.xz"
+  PKG_GIT_URL="https://github.com/SolidRun/u-boot-imx6.git"
+  PKG_GIT_BRANCH="imx6"
 else
   exit 0
 fi
 PKG_REV="1"
-PKG_ARCH="arm"
+PKG_ARCH="arm aarch64"
 PKG_LICENSE="GPL"
 PKG_DEPENDS_TARGET="toolchain"
 PKG_PRIORITY="optional"
@@ -64,25 +65,25 @@ make_target() {
   done
 
   for UBOOT_TARGET in $UBOOT_CONFIG; do
-    make CROSS_COMPILE="$TARGET_PREFIX" ARCH="$TARGET_ARCH" mrproper
-    make CROSS_COMPILE="$TARGET_PREFIX" ARCH="$TARGET_ARCH" $UBOOT_TARGET
-    make CROSS_COMPILE="$TARGET_PREFIX" ARCH="$TARGET_ARCH" HOSTCC="$HOST_CC" HOSTSTRIP="true"
+    make CROSS_COMPILE=${TARGET_NAME}- ARCH=$TARGET_ARCH mrproper
+    make CROSS_COMPILE=${TARGET_NAME}- ARCH=$TARGET_ARCH $UBOOT_TARGET
+    make CROSS_COMPILE=${TARGET_NAME}- ARCH=$TARGET_ARCH HOSTCC="$HOST_CC" HOSTSTRIP="true"
 
     # rename files in case of multiple targets
     if [ $UBOOT_TARGET_CNT -gt 1 ]; then
       if [ "$UBOOT_TARGET" = "mx6_cubox-i_config" ]; then
-        TARGET_NAME="cuboxi"
+        UBOOT_TARGET_NAME="cuboxi"
       elif [ "$UBOOT_TARGET" = "matrix" ]; then
-        TARGET_NAME="matrix"
-      elif [ "$UBOOT_TARGET" = "udoo_quad_config" ]; then
-        TARGET_NAME="udoo_quad"
+        UBOOT_TARGET_NAME="matrix"
+      elif [ "$UBOOT_TARGET" = "udoo_config" ]; then
+        UBOOT_TARGET_NAME="udoo"
       else
-        TARGET_NAME="undef"
+        UBOOT_TARGET_NAME="undef"
       fi
 
-      [ -f u-boot.img ] && mv u-boot.img u-boot-$TARGET_NAME.img || :
-      [ -f u-boot.imx ] && mv u-boot.imx u-boot-$TARGET_NAME.imx || :
-      [ -f SPL ] && mv SPL SPL-$TARGET_NAME || :
+      [ -f u-boot.img ] && mv u-boot.img u-boot-$UBOOT_TARGET_NAME.img || :
+      [ -f u-boot.imx ] && mv u-boot.imx u-boot-$UBOOT_TARGET_NAME.imx || :
+      [ -f SPL ] && mv SPL SPL-$UBOOT_TARGET_NAME || :
     fi
   done
 }

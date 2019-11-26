@@ -1,6 +1,6 @@
 ################################################################################
 #      This file is part of OpenELEC - http://www.openelec.tv
-#      Copyright (C) 2009-2014 Stephan Raue (stephan@openelec.tv)
+#      Copyright (C) 2009-2017 Stephan Raue (stephan@openelec.tv)
 #
 #  OpenELEC is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="libpng"
-PKG_VERSION="1.6.16"
+PKG_VERSION="1.6.28"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="OSS"
@@ -31,30 +31,16 @@ PKG_SHORTDESC="libpng: Portable Network Graphics (PNG) Reference Library"
 PKG_LONGDESC="PNG (Portable Network Graphics) is an extensible file format for the lossless, portable, well-compressed storage of raster images. PNG provides a patent-free replacement for GIF and can also replace many common uses of TIFF. Indexed-color, grayscale, and truecolor images are supported, plus an optional alpha channel. Sample depths range from 1 to 16 bits."
 
 PKG_IS_ADDON="no"
-PKG_AUTORECONF="yes"
+PKG_AUTORECONF="no"
 
-PKG_CONFIGURE_OPTS_TARGET="ac_cv_lib_z_zlibVersion=yes \
-                           --enable-static \
-                           --disable-shared"
-
-PKG_CONFIGURE_OPTS_HOST="--enable-static --disable-shared"
-
-pre_configure_host() {
-  export CFLAGS="$CFLAGS -fPIC -DPIC"
-  export CPPFLAGS="$CPPFLAGS -I$ROOT/$TOOLCHAIN/include"
-}
-
-pre_configure_target() {
-  export CFLAGS="$CFLAGS -fPIC -DPIC"
-  export CPPFLAGS="$CPPFLAGS -I$SYSROOT_PREFIX/usr/include"
-}
+PKG_CMAKE_OPTS_HOST="-DPNG_SHARED=OFF -DPNG_STATIC=ON -DPNG_TESTS=OFF -DCMAKE_SYSTEM_PROCESSOR=$(uname -m)"
+PKG_CMAKE_OPTS_TARGET="-DPNG_SHARED=OFF -DPNG_STATIC=ON -DPNG_TESTS=OFF -DCMAKE_SYSTEM_PROCESSOR=$TARGET_ARCH"
 
 post_makeinstall_target() {
   sed -e "s:\([\"'= ]\)/usr:\\1$SYSROOT_PREFIX/usr:g" \
-      -e "s:libs=\"-lpng15\":libs=\"-lpng15 -lz\":g" \
+      -e "s:libs=\"-lpng16\":libs=\"-lpng16 -lz\":g" \
       -i $SYSROOT_PREFIX/usr/bin/libpng*-config
 
-  cp -P $SYSROOT_PREFIX/usr/bin/libpng*-config $ROOT/$TOOLCHAIN/bin
-
   rm -rf $INSTALL/usr/bin
+  rm -rf $INSTALL/usr/lib
 }

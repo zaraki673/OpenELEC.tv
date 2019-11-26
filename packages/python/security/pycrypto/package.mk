@@ -1,6 +1,6 @@
 ################################################################################
 #      This file is part of OpenELEC - http://www.openelec.tv
-#      Copyright (C) 2009-2014 Stephan Raue (stephan@openelec.tv)
+#      Copyright (C) 2009-2017 Stephan Raue (stephan@openelec.tv)
 #
 #  OpenELEC is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="pycrypto"
-PKG_VERSION="2.6"
+PKG_VERSION="2.6.1"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="LGPL"
@@ -39,10 +39,6 @@ PKG_CONFIGURE_OPTS_TARGET="ac_cv_func_realloc_0_nonnull=yes \
 pre_configure_target() {
   cd $ROOT/$PKG_BUILD
   rm -rf .$TARGET_NAME
-
-  export PYTHONXCPREFIX="$SYSROOT_PREFIX/usr"
-#  export LDFLAGS="$LDFLAGS -L$SYSROOT_PREFIX/usr/lib -L$SYSROOT_PREFIX/lib"
-  export LDSHARED="$CC -shared"
 }
 
 make_target() {

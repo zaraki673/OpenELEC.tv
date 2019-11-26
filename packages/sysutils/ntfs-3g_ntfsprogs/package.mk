@@ -1,6 +1,6 @@
 ################################################################################
 #      This file is part of OpenELEC - http://www.openelec.tv
-#      Copyright (C) 2009-2014 Stephan Raue (stephan@openelec.tv)
+#      Copyright (C) 2009-2017 Stephan Raue (stephan@openelec.tv)
 #
 #  OpenELEC is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="ntfs-3g_ntfsprogs"
-PKG_VERSION="2015.3.14"
+PKG_VERSION="2017.3.23"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
@@ -47,6 +47,7 @@ post_makeinstall_target() {
   rm -rf $INSTALL/usr/bin
   rm -rf $INSTALL/bin/lowntfs-3g
   rm -rf $INSTALL/sbin/mount.lowntfs-3g
+  rm -rf $INSTALL/sbin/mkfs.ntfs
 
   mkdir -p $INSTALL/sbin
     ln -sf /bin/ntfs-3g $INSTALL/sbin/mount.ntfs

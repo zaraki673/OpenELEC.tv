@@ -1,6 +1,6 @@
 ################################################################################
 #      This file is part of OpenELEC - http://www.openelec.tv
-#      Copyright (C) 2009-2014 Stephan Raue (stephan@openelec.tv)
+#      Copyright (C) 2009-2017 Stephan Raue (stephan@openelec.tv)
 #
 #  OpenELEC is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
 ################################################################################
 
 PKG_NAME="e2fsprogs"
-PKG_VERSION="1.42.12"
+PKG_VERSION="1.43.4"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
@@ -33,9 +33,9 @@ PKG_IS_ADDON="no"
 
 PKG_AUTORECONF="yes"
 
-if [ "$HFSTOOLS" = "yes" ]; then
-  PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET diskdev_cmds"
-fi
+PKG_CONFIGURE_OPTS_HOST="--prefix=$ROOT/$TOOLCHAIN/ \
+                         --bindir=$ROOT/$TOOLCHAIN/bin \
+                         --sbindir=$ROOT/$TOOLCHAIN/sbin"
 
 PKG_CONFIGURE_OPTS_TARGET="BUILD_CC=$HOST_CC \
                            --prefix=/usr \
@@ -67,7 +67,14 @@ PKG_CONFIGURE_OPTS_TARGET="BUILD_CC=$HOST_CC \
 
 PKG_CONFIGURE_OPTS_INIT="$PKG_CONFIGURE_OPTS_TARGET"
 
+pre_make_host() {
+  # dont build parallel
+  MAKEFLAGS=-j1
+}
+
 post_makeinstall_target() {
+  make -C lib/et DESTDIR=$SYSROOT_PREFIX install
+
   rm -rf $INSTALL/sbin/badblocks
   rm -rf $INSTALL/sbin/blkid
   rm -rf $INSTALL/sbin/dumpe2fs
@@ -96,3 +103,14 @@ makeinstall_init() {
     ln -sf mke2fs $INSTALL/sbin/mkfs.ext4dev
   fi
 }
+
+make_host() {
+  make -C lib/et
+  make -C lib/ext2fs
+}
+
+makeinstall_host() {
+  make -C lib/et install
+  make -C lib/ext2fs install
+}
+

@@ -1,6 +1,6 @@
 ################################################################################
 #      This file is part of OpenELEC - http://www.openelec.tv
-#      Copyright (C) 2009-2014 Stephan Raue (stephan@openelec.tv)
+#      Copyright (C) 2009-2017 Stephan Raue (stephan@openelec.tv)
 #
 #  OpenELEC is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -17,12 +17,12 @@
 ################################################################################
 
 PKG_NAME="sqlite"
-PKG_VERSION="autoconf-3081001"
+PKG_VERSION="autoconf-3180000"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="PublicDomain"
-PKG_SITE="http://www.sqlite.org/"
-PKG_URL="http://sqlite.org/2015/$PKG_NAME-$PKG_VERSION.tar.gz"
+PKG_SITE="https://www.sqlite.org/"
+PKG_URL="https://www.sqlite.org/2017/$PKG_NAME-$PKG_VERSION.tar.gz"
 PKG_DEPENDS_TARGET="toolchain"
 PKG_PRIORITY="optional"
 PKG_SECTION="database"
@@ -42,6 +42,9 @@ PKG_AUTORECONF="yes"
 # that data in the sqlite_stat3 table. The query planner will then use the histogram
 # data to help it make better index choices.
   CFLAGS="$CFLAGS -DSQLITE_ENABLE_STAT3"
+
+# relocation R_MIPS_HI16 against `a local symbol' can not be used when making a shared object; recompile with -fPIC
+  CFLAGS="$CFLAGS -fPIC"
 
 # When this C-preprocessor macro is defined, SQLite includes some additional APIs
 # that provide convenient access to meta-data about tables and queries. The APIs that
@@ -74,7 +77,3 @@ PKG_CONFIGURE_OPTS_TARGET="--enable-static \
                            --enable-threadsafe \
                            --enable-dynamic-extensions \
                            --with-gnu-ld"
-
-post_makeinstall_target() {
-  rm -rf $INSTALL/usr/bin
-}

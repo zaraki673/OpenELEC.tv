@@ -1,6 +1,6 @@
 ################################################################################
 #      This file is part of OpenELEC - http://www.openelec.tv
-#      Copyright (C) 2009-2014 Stephan Raue (stephan@openelec.tv)
+#      Copyright (C) 2009-2017 Stephan Raue (stephan@openelec.tv)
 #
 #  OpenELEC is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -17,12 +17,13 @@
 ################################################################################
 
 PKG_NAME="libbdplus"
-PKG_VERSION="0.1.2"
+PKG_VERSION="a908260"
 PKG_REV="1"
 PKG_ARCH="any"
 PKG_LICENSE="GPL"
 PKG_SITE="https://www.videolan.org/developers/libbdplus.html"
-PKG_URL="ftp://ftp.videolan.org/pub/videolan/libbdplus/$PKG_VERSION/$PKG_NAME-$PKG_VERSION.tar.bz2"
+PKG_GIT_URL="https://git.videolan.org/git/libbdplus.git"
+PKG_GIT_BRANCH="master"
 PKG_DEPENDS_TARGET="toolchain libgcrypt libgpg-error"
 PKG_PRIORITY="optional"
 PKG_SECTION="multimedia"
@@ -35,11 +36,13 @@ PKG_AUTORECONF="yes"
 PKG_CONFIGURE_OPTS_TARGET="--disable-werror \
                            --disable-extra-warnings \
                            --disable-optimizations \
+                           --with-libgcrypt-prefix=$SYSROOT_PREFIX/usr \
+                           --with-gpg-error-prefix=$SYSROOT_PREFIX/usr \
                            --with-gnu-ld"
 
 if [ "$BLURAY_AACS_SUPPORT" = "yes" ]; then
   PKG_DEPENDS_TARGET="$PKG_DEPENDS_TARGET libaacs"
-  PKG_CONFIGURE_OPTS_TARGET="$PKG_CONFIGURE_OPTS_TARGET --with-libaacs"
+  PKG_CONFIGURE_OPTS_TARGET+=" --with-libaacs"
 else
-  PKG_CONFIGURE_OPTS_TARGET="$PKG_CONFIGURE_OPTS_TARGET --without-libaacs"
+  PKG_CONFIGURE_OPTS_TARGET+=" --without-libaacs"
 fi

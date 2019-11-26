@@ -2,7 +2,7 @@
 
 ################################################################################
 #      This file is part of OpenELEC - http://www.openelec.tv
-#      Copyright (C) 2009-2014 Stephan Raue (stephan@openelec.tv)
+#      Copyright (C) 2009-2017 Stephan Raue (stephan@openelec.tv)
 #
 #  OpenELEC is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -41,9 +41,9 @@ else
   card=`echo $1 | sed 's/[^0-9]*//g'`
 
 # set common mixer params
-  mixer $card Master 100%
+  mixer $card Master 0db
   mixer $card Front 100%
-  mixer $card PCM 100%
+  mixer $card PCM 0db
   mixer $card Synth 100%
 
 # mute CD, since using digital audio instead
